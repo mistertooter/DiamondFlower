@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Diamond to Sunflower</title><style>
+*{box-sizing:border-box}body{margin:0;background:#080b24;display:grid;place-items:center;min-height:100vh;font-family:Arial,sans-serif}main{width:min(100vw,600px);position:relative}canvas{width:100%;display:block;border-radius:20px}button{position:absolute;bottom:18px;right:18px;background:#ffffffdd;border:0;border-radius:24px;padding:10px 18px;font-weight:bold;cursor:pointer}
+</style></head><body><main><canvas id="scene" width="900" height="1200" aria-label="A colorful diamond transforms into a sunflower"></canvas><button id="toggle">Pause</button></main><script>
+const c=document.querySelector('canvas'),g=c.getContext('2d'),TAU=Math.PI*2;
+const clamp=x=>Math.max(0,Math.min(1,x)),ease=x=>{x=clamp(x);return x*x*(3-2*x)},mix=(a,b,t)=>a+(b-a)*t;
+function path(points,fill,stroke){g.beginPath();points.forEach((p,i)=>i?g.lineTo(...p):g.moveTo(...p));g.closePath();g.fillStyle=fill;g.fill();if(stroke){g.strokeStyle=stroke;g.lineWidth=2;g.stroke()}}
+function render(seconds){let t=seconds%12;let b=ease((t-2)/3.4)*(1-ease((t-9.7)/2.3)),turn=.08*Math.sin(t*TAU/12);g.clearRect(0,0,900,1200);
+let bg=g.createRadialGradient(450,530,40,450,550,850);bg.addColorStop(0,'#282154');bg.addColorStop(.5,'#111938');bg.addColorStop(1,'#050a1c');g.fillStyle=bg;g.fillRect(0,0,900,1200);
+for(let i=0;i<100;i++){let x=(Math.sin(i*127.1)*.5+.5)*900,y=(Math.sin(i*87.7)*.5+.5)*1200;g.globalAlpha=.2+.3*(.5+.5*Math.sin(t*TAU/12+i));g.fillStyle=i%3?'#a6eaff':'#ffc668';g.beginPath();g.arc(x,y,i%4===0?2:1,0,TAU);g.fill()}g.globalAlpha=1;
+g.textAlign='center';g.fillStyle='#b2d5f7';g.font='bold 20px Arial';g.fillText('A TRANSFORMATION IN LIGHT',450,94);g.fillStyle='#fff';g.font='bold 56px Arial';g.fillText('Diamond to Sunflower',450,164);
+// Growing stem and leaves.
+g.save();g.globalAlpha=b;g.strokeStyle='#329e65';g.lineWidth=18;g.lineCap='round';g.beginPath();g.moveTo(450,950);g.bezierCurveTo(440,840,475,740,450,550);g.stroke();
+for(let side of [-1,1]){g.save();g.translate(450,side===1?815:860);g.scale(side,1);let lg=g.createLinearGradient(0,0,145,-100);lg.addColorStop(0,'#146950');lg.addColorStop(.5,'#54c66b');lg.addColorStop(1,'#a6eb67');g.fillStyle=lg;g.beginPath();g.moveTo(0,0);g.bezierCurveTo(20,-115,110,-110,155,-125);g.bezierCurveTo(150,-35,70,15,0,0);g.fill();g.strokeStyle='#b2ec83';g.lineWidth=2;g.beginPath();g.moveTo(0,0);g.lineTo(145,-117);g.stroke();g.restore()}g.restore();
+g.save();g.translate(450,540);g.rotate(turn);let halo=g.createRadialGradient(0,0,20,0,0,360);halo.addColorStop(0,`rgba(255,186,53,${.12*b})`);halo.addColorStop(.6,`rgba(72,209,255,${.13*(1-b)})`);halo.addColorStop(1,'transparent');g.fillStyle=halo;g.fillRect(-380,-380,760,760);
+// Twenty-eight crystal rays unfold continuously into layered petals.
+for(let layer=0;layer<2;layer++)for(let i=0;i<20;i++){let a=i*TAU/20+layer*.157;g.save();g.rotate(a);let start=mix(0,72,b),len=mix(8,layer?162:205,b),width=mix(0,layer?29:33,b);g.translate(0,-start);let p=g.createLinearGradient(0,0,0,-len);p.addColorStop(0,'#d16d0a');p.addColorStop(.32,layer?'#ffb516':'#f2a80b');p.addColorStop(.75,'#ffe75e');p.addColorStop(1,'#fff5a2');g.fillStyle=p;g.beginPath();g.moveTo(0,9);g.bezierCurveTo(-width*1.4,-len*.25,-width,-len*.75,0,-len);g.bezierCurveTo(width,-len*.75,width*1.4,-len*.25,0,9);g.fill();g.strokeStyle='rgba(255,250,175,.4)';g.lineWidth=1.2;g.beginPath();g.moveTo(0,0);g.quadraticCurveTo(-4,-len*.45,0,-len*.92);g.stroke();g.restore()}
+// Jewel facets shrink into the sunflower's seed head.
+g.save();g.globalAlpha=1-ease(b);let s=1+.04*Math.sin(t*TAU/12);g.scale(s,s);g.shadowColor='#48e1ff';g.shadowBlur=35;
+let A=[-170,-100],B=[-95,-185],C=[95,-185],D=[170,-100],E=[0,180],F=[0,-100];
+path([A,B,C,D,E],'#68ddff');g.shadowBlur=0;path([A,B,F],'#f3faff','#bdf4ff');path([B,C,F],'#b0b8ff','#d9f9ff');path([C,D,F],'#35d9ef','#bcffff');path([A,F,E],'#247bee','#9cddff');path([F,D,E],'#ab46e7','#f1b1ff');path([B,[-45,-185],F],'#63f9f0');path([[-45,-185],C,F],'#fbc6ff');path([F,[65,-100],E],'#51d9ff');g.restore();
+g.save();g.globalAlpha=ease(b);let r=95*b;let center=g.createRadialGradient(-22,-24,5,0,0,95);center.addColorStop(0,'#784422');center.addColorStop(.65,'#442615');center.addColorStop(1,'#241510');g.fillStyle=center;g.shadowColor='#ffab27';g.shadowBlur=16;g.beginPath();g.arc(0,0,r,0,TAU);g.fill();g.shadowBlur=0;
+for(let i=0;i<620;i++){let rad=87*Math.sqrt(i/620)*b,a=i*2.39996323;let x=Math.cos(a)*rad,y=Math.sin(a)*rad;g.fillStyle=['#d79e46','#a96f2d','#efc377','#6d431f'][i%4];g.beginPath();g.ellipse(x,y,2.1*b,3.3*b,a,0,TAU);g.fill()}g.restore();
+// Orbiting glints make the transformation feel luminous.
+for(let i=0;i<24;i++){let a=i*TAU/24+t*TAU/12,r=220+55*Math.sin(i*4+t*TAU/12);let x=Math.cos(a)*r,y=Math.sin(a)*r;g.globalAlpha=.2+.5*Math.pow(Math.sin(i+t*TAU/12),2);g.fillStyle=i%2?'#ffe79a':'#82edff';g.save();g.translate(x,y);g.rotate(a);g.beginPath();g.moveTo(-5,0);g.lineTo(0,-2);g.lineTo(5,0);g.lineTo(0,2);g.fill();g.restore()}g.restore();g.globalAlpha=1;
+g.fillStyle='#ffffff';g.font='bold 34px Arial';g.fillText(b<.15?'BRILLIANCE':b>.95?'IN FULL BLOOM':'UNFOLDING',450,1040);g.fillStyle='#aec5da';g.font='24px Arial';g.fillText('From crystal light to golden life',450,1086);
+}
+window.render=render;let paused=false,elapsed=0,last=performance.now();function animate(now){if(!paused)elapsed+=(now-last)/1000;last=now;render(elapsed);requestAnimationFrame(animate)}requestAnimationFrame(animate);document.querySelector('button').onclick=()=>{paused=!paused;document.querySelector('button').textContent=paused?'Play':'Pause'};
+</script></body></html>
